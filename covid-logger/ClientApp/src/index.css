@@ -4,3 +4,34 @@
         padding-top: 50px;
     }
 }
+
+.form-group-inline-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.half-rule {
+    border-top: 1px solid #535353;
+}
+
+.inline-button-container {
+
+    display: flex;
+    flex-direction: row;
+    /*min-width: 100%;*/
+    /*flex: 1; */
+    justify-content: space-between;
+}
+
+.inline-text-group-item {
+    margin-right: 1rem;
+}
+
+.inline-text-group-item input[type=text], label {
+    margin-right: 1rem;
+}
+
+.inline-radio-group-item input[type=radio], label {
+    margin-right: 1rem;
+}
+
