@@ -11,6 +11,7 @@ namespace ResidentLog.Models.Entities
         public int DutyType { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
+        public DateTime DateAssigned { get; set; }
 
         /// <summary>
         ///
@@ -19,12 +20,14 @@ namespace ResidentLog.Models.Entities
         /// <param name="dutyType"></param>
         /// <param name="dateStart"></param>
         /// <param name="dateEnd"></param>
-        public DutyAssignment(int residentId, int dutyType, DateTime dateStart, DateTime dateEnd)
+        public DutyAssignment(int residentId, int dutyType,
+            DateTime dateStart, DateTime dateEnd, DateTime dateAssigned)
         {
             ResidentID = residentId;
             DutyType = dutyType;
             DateStart = dateStart;
             DateEnd = dateEnd;
+            DateAssigned = dateAssigned;
         }
     }
 }

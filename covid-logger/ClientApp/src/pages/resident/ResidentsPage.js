@@ -42,7 +42,7 @@ export class ResidentsPage extends Component {
             <div>
                 <h1>Resident</h1>
 
-                <p>Enter resident information here.</p>
+                <p>Enter resident information:</p>
 
                 <div className="inline-button-container">
                     <div className="inline-button-container">
@@ -64,7 +64,7 @@ export class ResidentsPage extends Component {
                     </div>
 
                     <div className="form-group-inline-flex">
-                        <div className="form-group inline-text-group-item ">
+                        <div className="form-group inline-group-item ">
                             <label>First Name:</label>
                             <input type="text" className="form-control"
                                    maxLength={32}
@@ -72,7 +72,7 @@ export class ResidentsPage extends Component {
                                    placeholder="John"/>
                         </div>
 
-                        <div className="form-group inline-text-group-item ">
+                        <div className="form-group inline-group-item ">
                             <label>Last Name:</label>
                             <input type="text" className="form-control"
                                    maxLength={32}
@@ -89,6 +89,13 @@ export class ResidentsPage extends Component {
                     </div>
 
                     <div className="form-group">
+                        <label>Phone Number:</label>
+                        <input type="text" className="form-control"
+                               maxLength={16}
+                               placeholder="(123) 456-7890"/>
+                    </div>
+
+                    <div className="form-group">
                         <label>Date of Symptoms:</label>
                         <input type="date" className="form-control"/>
                     </div>
@@ -99,25 +106,29 @@ export class ResidentsPage extends Component {
                                   placeholder="Description"></textarea>
                     </div>
 
-                    <div className="form-group">
-                        <label>Date of COVID-19 Testing:</label>
-                        <input type="date" className="form-control"/>
-                    </div>
+                    <div className="form-group form-group-inline-flex">
 
-                    <div className="form-group">
-                        <label>Result of COVID-19 Test:</label>
-                        <select className="form-control">
-                            <option>Not Tested</option>
-                            <option>Pending</option>
-                            <option>Negative</option>
-                            <option>Positive</option>
-                        </select>
+                        <div className="form-group inline-group-item">
+                            <label>Date of COVID-19 Testing:</label>
+                            <input type="date" className="form-control"/>
+                        </div>
+
+                        <div className="form-group inline-group-item">
+                            <label>Result of COVID-19 Test:</label>
+                            <select className="form-control">
+                                <option>Not Tested</option>
+                                <option>Pending</option>
+                                <option>Negative</option>
+                                <option>Positive</option>
+                            </select>
+                        </div>
+
                     </div>
 
                     <div className="form-group">
                         <label>Quarantine Status:</label>
 
-                        <div className="form-group-inline-flex">
+                        <div className="form-group form-group-inline-flex">
                             <div className="form-check inline-radio-group-item">
                                 <input className="form-check-input " type="radio"
                                        value="Not Quarantined"
@@ -135,16 +146,55 @@ export class ResidentsPage extends Component {
                                 </label>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="form-group form-group-inline-flex">
+
+                        <div className="form-group inline-group-item">
+                            <label>Quarantined Until:</label>
+                            <input type="date" className="form-control"/>
+                        </div>
 
                     </div>
+
+                    <button type="button" className="btn btn-primary btn-sm">Save</button>
                 </form>
 
                 <hr className="half-rule"/>
 
                 <h1>Duty Assignment</h1>
 
-                <p>Enter duty assignment:</p>
+                <p>Assign resident duty:</p>
 
+                <form>
+                    <div className="form-group">
+
+                        <div className="form-group-inline-flex">
+                            <div className="form-group inline-group-item">
+                                <label>Duty:</label>
+                                <select className="form-control">
+                                    <option>Home Awaiting Assignment</option>
+                                    <option>Floor</option>
+                                    <option>ICU Day</option>
+                                    <option>ICU Night</option>
+                                    <option>COVID</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group inline-group-item">
+                                <label>Start Date:</label>
+                                <input type="date" className="form-control"/>
+                            </div>
+
+                            <div className="form-group inline-group-item">
+                                <label>End Date:</label>
+                                <input type="date" className="form-control"/>
+                            </div>
+                        </div>
+
+                        <button type="button" className="btn btn-primary btn-sm">Assign</button>
+                    </div>
+                </form>
             </div>
         );
     }
