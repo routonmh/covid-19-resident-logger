@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ResidentLog.Models;
 using ResidentLog.Models.Entities;
 
 namespace ResidentLog.Controllers
@@ -10,12 +11,9 @@ namespace ResidentLog.Controllers
     public class ResidentController
     {
         [HttpGet("{residentId}")]
-        public async Task<Resident> Get()
+        public async Task<Resident> Get(int residentId)
         {
-            Resident resident = null;
-
-
-            return resident;
+            return await ResidentModel.GetResidentEntry(residentId);
         }
 
         /// <summary>
@@ -24,26 +22,28 @@ namespace ResidentLog.Controllers
         /// <param name="resident"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task Post([FromBody, Required] Resident resident)
+        public async Task<ActionResult> Post([FromBody, Required] Resident resident)
         {
-
+            await ResidentModel.CreateResidentEntry(resident);
+            return new OkResult();
         }
 
         /// <summary>
         ///
         /// </summary>
         /// <returns></returns>
-        [HttpPut]
-        public async Task Put([FromBody, Required] Resident resident)
+        [HttpPut("{residentId}")]
+        public async Task<ActionResult> Put([FromRoute, Required] int residentId,
+            [FromBody, Required] Resident resident)
         {
-
+            await ResidentModel.UpdateResidentEntry(residentId, resident);
+            return new OkResult();
         }
 
         [HttpDelete("{residentId}")]
         public async Task Delete([FromRoute, Required] int residentId)
         {
-
+            await ResidentModel.DeleteResidentEntry(residentId);
         }
-
     }
 }

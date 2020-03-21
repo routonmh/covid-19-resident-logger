@@ -20,17 +20,37 @@ export class NavMenu extends Component {
                     <Nav>
                         <LinkContainer to={'/'} exact>
                             <NavItem>
-                                <Glyphicon glyph='home'/> Residents
+                                <Glyphicon glyph='home'/> Data Entry
                             </NavItem>
                         </LinkContainer>
-                        <LinkContainer to={'/counter'}>
+                        <LinkContainer to={'/residents'}>
                             <NavItem>
-                                <Glyphicon glyph='education'/> Counter
+                                <Glyphicon glyph='user'/> Residents
                             </NavItem>
                         </LinkContainer>
-                        <LinkContainer to={'/fetchdata'}>
+                        <LinkContainer to={'/assignments'}>
                             <NavItem>
-                                <Glyphicon glyph='th-list'/> Fetch data
+                                <Glyphicon glyph='th-list'/> Assignments
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/available'}>
+                            <NavItem>
+                                <Glyphicon glyph='ok'/> Available
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/on-duty'}>
+                            <NavItem>
+                                <Glyphicon glyph='time'/> On Duty
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/quarantined'}>
+                            <NavItem>
+                                <Glyphicon glyph='ban-circle'/> Quarantined
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/tested-positive'}>
+                            <NavItem>
+                                <Glyphicon glyph='warning-sign'/> Tested Postive
                             </NavItem>
                         </LinkContainer>
                     </Nav>

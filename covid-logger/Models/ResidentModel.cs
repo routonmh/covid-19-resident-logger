@@ -33,7 +33,41 @@ namespace ResidentLog.Models
                 cmd.Parameters.AddWithValue("@SymptomsDate", resident.SymptomsDate);
                 cmd.Parameters.AddWithValue("@SymptomsDescription", resident.SymptomsDescription);
                 cmd.Parameters.AddWithValue("@Covid19TestDate", resident.Covid19TestDate);
-                cmd.Parameters.AddWithValue("@Covid19TestResult", resident.Covid19TestDate);
+                cmd.Parameters.AddWithValue("@Covid19TestResult", resident.Covid19TestResult.TestResultType);
+                cmd.Parameters.AddWithValue("@IsQuarantined", resident.IsQuarantined);
+                cmd.Parameters.AddWithValue("@QuarantinedUntil", resident.QuarantinedUntil);
+                cmd.CommandText = query;
+
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="residentId"></param>
+        /// <param name="resident"></param>
+        /// <returns></returns>
+        public static async Task UpdateResidentEntry(int residentId, Resident resident)
+        {
+            using (LocalDB db = new LocalDB())
+            {
+                await db.OpenConnectionAsync();
+                MySqlCommand cmd = db.CreateCommand();
+                string query = "UPDATE resident SET FirstName = @FirstName, LastName = @LastName, " +
+                               "PGY = @PGY, SymptomsDate = @SymptomsDate, Covid19TestDate = @Covid19TestDate, " +
+                               "Covid19TestResult = @Covid19TestResult, IsQuarantined = @IsQuarantined, " +
+                               "QuarantinedUntil = @QuarantinedUntil WHERE ResidentID = @ResidentID;";
+
+                cmd.Parameters.AddWithValue("@ResidentID", residentId);
+                cmd.Parameters.AddWithValue("@FirstName", resident.FirstName);
+                cmd.Parameters.AddWithValue("@LastName", resident.LastName);
+                cmd.Parameters.AddWithValue("@PGY", resident.PGY);
+                cmd.Parameters.AddWithValue("@PhoneNumber", resident.PhoneNumber);
+                cmd.Parameters.AddWithValue("@SymptomsDate", resident.SymptomsDate);
+                cmd.Parameters.AddWithValue("@SymptomsDescription", resident.SymptomsDescription);
+                cmd.Parameters.AddWithValue("@Covid19TestDate", resident.Covid19TestDate);
+                cmd.Parameters.AddWithValue("@Covid19TestResult", resident.Covid19TestResult.TestResultType);
                 cmd.Parameters.AddWithValue("@IsQuarantined", resident.IsQuarantined);
                 cmd.Parameters.AddWithValue("@QuarantinedUntil", resident.QuarantinedUntil);
                 cmd.CommandText = query;
@@ -47,7 +81,7 @@ namespace ResidentLog.Models
         /// </summary>
         /// <param name="residentId"></param>
         /// <returns></returns>
-        public static async Task<Resident> GetResident(int residentId)
+        public static async Task<Resident> GetResidentEntry(int residentId)
         {
             Resident resident = null;
 
@@ -57,7 +91,10 @@ namespace ResidentLog.Models
                 MySqlCommand cmd = db.CreateCommand();
                 string query = "SELECT ResidentID, FirstName, LastName, PGY, PhoneNumber, " +
                                "SymptomsDate, SymptomsDescription, Covid19TestDate, Covid19TestResult, " +
-                               "IsQuarantined, QuarantinedUntil FROM resident WHERE ResidentID = @ResidentID;";
+                               "IsQuarantined, QuarantinedUntil, TestResultDescription" +
+                               "FROM resident INNER JOIN test_result ON test_result.TestResultType = " +
+                               "resident.TestResultType" +
+                               "WHERE ResidentID = @ResidentID;";
 
                 cmd.Parameters.AddWithValue("@ResidentID", residentId);
                 cmd.CommandText = query;
@@ -75,7 +112,9 @@ namespace ResidentLog.Models
                         reader["SymptomsDate"] as DateTime?,
                         reader["SymptomsDescription"] as string ?? string.Empty,
                         reader["Covid19TestDate"] as DateTime?,
-                        reader["Covid19TestResult"] as string ?? string.Empty,
+                        new TestResult(
+                            reader["TestResultType"] as int? ?? 0,
+                            reader["TestResultDescription"] as string ?? string.Empty),
                         Convert.ToBoolean(reader["IsQuarantined"] as sbyte? ?? 0),
                         reader["QuarantinedUntil"] as DateTime?);
                 }
@@ -87,12 +126,21 @@ namespace ResidentLog.Models
         /// <summary>
         ///
         /// </summary>
-        /// <param name="residentID"></param>
-        /// <param name="resident"></param>
+        /// <param name="residentId"></param>
         /// <returns></returns>
-        public static async Task UpdateResident(int residentID, Resident resident)
+        public static async Task DeleteResidentEntry(int residentId)
         {
+            using (LocalDB db = new LocalDB())
+            {
+                await db.OpenConnectionAsync();
+                MySqlCommand cmd = db.CreateCommand();
+                string query = "DELETE FROM resident WHERE ResidentID = @ResidentID";
 
+                cmd.Parameters.AddWithValue("@ResidentID", residentId);
+                cmd.CommandText = query;
+
+                await cmd.ExecuteNonQueryAsync();
+            }
         }
     }
 }

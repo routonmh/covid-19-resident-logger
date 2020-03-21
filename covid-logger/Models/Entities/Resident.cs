@@ -15,7 +15,7 @@ namespace ResidentLog.Models.Entities
         public DateTime? SymptomsDate { get; set; }
         public string SymptomsDescription { get; set; }
         public DateTime? Covid19TestDate { get; set; }
-        public string Covid19TestResult { get; set; }
+        public TestResult Covid19TestResult { get; set; }
         public bool IsQuarantined { get; set; }
         public DateTime? QuarantinedUntil { get; set; }
 
@@ -35,7 +35,7 @@ namespace ResidentLog.Models.Entities
         /// <param name="quarantinedUntil"></param>
         public Resident(int residentId, string firstName, string lastName, string pgy,
             string phoneNumber, DateTime? symptomsDate, string symptomsDescription,
-            DateTime? covid19TestDate, string covid19TestResult, bool isQuarantined,
+            DateTime? covid19TestDate, TestResult covid19TestResult, bool isQuarantined,
             DateTime? quarantinedUntil)
         {
             ResidentID = residentId;

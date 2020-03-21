@@ -69,6 +69,7 @@ export class ResidentsPage extends Component {
                             <input type="text" className="form-control"
                                    maxLength={32}
                                    size={32}
+                                   onChange={e => this.setState({firstName: e.target.value})}
                                    placeholder="John"/>
                         </div>
 
@@ -85,6 +86,8 @@ export class ResidentsPage extends Component {
                     <div className="form-group">
                         <label>PGY:</label>
                         <input type="text" className="form-control"
+                               size={5}
+                               maxLength={5}
                                placeholder="PGY-"/>
                     </div>
 
@@ -92,6 +95,7 @@ export class ResidentsPage extends Component {
                         <label>Phone Number:</label>
                         <input type="text" className="form-control"
                                maxLength={16}
+                               size={16}
                                placeholder="(123) 456-7890"/>
                     </div>
 
