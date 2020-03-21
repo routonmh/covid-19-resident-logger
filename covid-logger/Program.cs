@@ -8,12 +8,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace covid_logger
+namespace ResidentLog
 {
     public class Program
     {
+        public static string DBConnectionString { get; set; }
+
         public static void Main(string[] args)
         {
+            DBConnectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
             CreateWebHostBuilder(args).Build().Run();
         }
 

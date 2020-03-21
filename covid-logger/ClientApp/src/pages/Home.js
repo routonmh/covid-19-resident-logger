@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 
 export class Home extends Component {
-  displayName = Home.name
+  displayName = Home.name;
+
+  componentDidMount() {
+      document.title = "Resident Log";
+  }
 
   render() {
     return (
