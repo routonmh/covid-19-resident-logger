@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using ResidentLog.Models.DTOs;
 
 namespace ResidentLog.Models.Entities
 {
@@ -49,6 +52,30 @@ namespace ResidentLog.Models.Entities
             Covid19TestResult = covid19TestResult;
             IsQuarantined = isQuarantined;
             QuarantinedUntil = quarantinedUntil;
+        }
+
+        public static Resident ConvertDTO(ResidentDTO residentDto, List<TestResult> testResultTypes)
+        {
+            int testResultCode = Convert.ToInt32(residentDto.Covid19TestResult);
+
+            Resident resident = new Resident(
+                residentDto.ResidentID,
+                residentDto.FirstName,
+                residentDto.LastName,
+                residentDto.PGY,
+                residentDto.PhoneNumber,
+                residentDto.SymptomsDate,
+                residentDto.SymptomsDescription,
+                residentDto.Covid19TestDate,
+                new TestResult(
+                    testResultCode,
+                    testResultTypes.Find(it =>
+                        it.TestResultType == testResultCode).TestResultDescription),
+                residentDto.IsQuarantined,
+                residentDto.QuarantinedUntil
+            );
+
+            return resident;
         }
     }
 }

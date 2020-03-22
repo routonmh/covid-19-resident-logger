@@ -1,36 +1,35 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using ResidentLog.Models.Entities;
 using ResidentLog.Utilities.DB;
 
 namespace ResidentLog.Models
 {
-    public static class DutyModel
+    public static class TestResultModel
     {
-        public static async Task<List<Duty>> GetDutyTypes()
+        public static async Task<List<TestResult>> GetTestResultTypes()
         {
-            List<Duty> dutyTypes = new List<Duty>();
+            List<TestResult> testResultTypes = new List<TestResult>();
 
             using (LocalDB db = new LocalDB())
             {
                 await db.OpenConnectionAsync();
                 MySqlCommand cmd = db.CreateCommand();
-                string query = "SELECT DutyType, DutyDescription FROM duty;";
+                string query = "SELECT TestResultType, TestResultDescription FROM " +
+                               "test_result ORDER BY TestResultType ASC;";
 
                 cmd.CommandText = query;
                 DbDataReader reader = await cmd.ExecuteReaderAsync();
-
                 if (reader.HasRows)
                     while (await reader.ReadAsync())
-                        dutyTypes.Add(new Duty(
-                            reader["DutyType"] as int? ?? 0,
-                            reader["DutyDescription"] as string ?? string.Empty));
+                        testResultTypes.Add(new TestResult(
+                            reader["TestResultType"] as int? ?? 0,
+                            reader["TestResultDescription"] as string ?? string.Empty));
             }
 
-            return dutyTypes;
+            return testResultTypes;
         }
     }
 }

@@ -12,5 +12,6 @@ namespace ResidentLog.Models.Entities
             TestResultType = type;
             TestResultDescription = description;
         }
+
     }
 }
