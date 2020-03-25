@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import dateformat from 'dateformat';
 
-export class ResidentsPage extends Component {
+export class ResidentEntry extends Component {
     displayName = "ResidentsPage";
 
     constructor(props) {
@@ -11,8 +12,6 @@ export class ResidentsPage extends Component {
         let idInParams = params.get('residentId');
         let creatingNewResident = !idInParams;
         let residentId = creatingNewResident ? "" : idInParams;
-        console.log("Create new: " + creatingNewResident);
-        console.log(residentId);
 
         let firstName = "";
         let lastName = "";
@@ -40,13 +39,15 @@ export class ResidentsPage extends Component {
             isQuarantined,
             quarantinedUntil,
 
-            residentIdDisplayText: creatingNewResident ? "(New)" : residentId,
             testResultOptions: [],
             dutyOptions: [],
 
-            selectedDutyOption: "",
+            selectedDutyOption: "0",
             dutyStartDate: "",
-            dutyEndDate: ""
+            dutyEndDate: "",
+
+            previousId: -1,
+            nextId: -1
         };
 
         this.canSubmitResidentChanges = this.canSubmitResidentChanges.bind(this);
@@ -59,8 +60,34 @@ export class ResidentsPage extends Component {
 
         document.title = "Resident Log";
 
+        this.fetchInitials();
+    }
+
+    async fetchInitials() {
+
+        if (!this.state.creatingNewResident)
+            await this.fetchResident();
+
         this.fetchTestResultOptions();
         this.fetchDutyOptions();
+        this.fetchLocalIDSet();
+    }
+
+    async fetchResident() {
+        try {
+            let req = axios.get(`/api/resident/${this.state.residentId}`);
+            let res = await req;
+
+            let residentFields = {...res.data};
+
+            residentFields.symptomsDate = dateformat(residentFields.symptomsDate, "isoDate");
+            residentFields.covid19TestDate = dateformat(residentFields.covid19TestDate, "isoDate");
+            residentFields.quarantinedUntil = dateformat(residentFields.quarantinedUntil, "isoDate");
+
+            this.setState({...residentFields});
+        } catch (ex) {
+            alert("ResidentID does not exist.");
+        }
     }
 
     async fetchTestResultOptions() {
@@ -72,38 +99,85 @@ export class ResidentsPage extends Component {
 
     async fetchDutyOptions() {
 
-        let req = axios.get('/api/resident/duty-types');
+        let req = axios.get('/api/duty/duty-types');
         let res = await req;
         this.setState({dutyOptions: res.data})
     }
 
+    async fetchLocalIDSet() {
+
+        if (this.state.residentId !== "") {
+            let req = axios.get(`/api/resident/local-id-set/${this.state.residentId}`);
+            let res = await req;
+
+            let localSet = res.data;
+
+            this.setState({
+                previousId: localSet.previousID,
+                nextId: localSet.nextID
+            })
+        }
+    }
+
     async submitResidentChanges() {
+
+        let fields = {
+            firstName: this.state.firstName,
+            lastName: this.state.lastName,
+            pgy: this.state.pgy,
+            phoneNumber: this.state.phoneNumber,
+            symptomsDate: this.state.symptomsDate,
+            symptomsDescription: this.state.symptomsDescription,
+            covid19TestDate: this.state.covid19TestDate,
+            covid19TestResult: this.state.covid19TestResult === "" ?
+                0 : this.state.covid19TestResult,
+            isQuarantined: this.state.isQuarantined,
+            quarantinedUntil: this.state.quarantinedUntil
+        };
+
         if (this.state.creatingNewResident) {
             try {
                 let req = axios.post('/api/resident', {
-                    firstName: this.state.firstName,
-                    lastName: this.state.lastName,
-                    pgy: this.state.pgy,
-                    phoneNumber: this.state.phoneNumber,
-                    symptomsDate: this.state.symptomsDate,
-                    symptomsDescription: this.state.symptomsDescription,
-                    covid19TestDate: this.state.covid19TestDate,
-                    covid19TestResult: this.state.covid19TestResult,
-                    isQuarantined: this.state.isQuarantined,
-                    quarantinedUntil: this.state.quarantinedUntil
+                    ...fields
                 });
-                await req;
-                alert("Resident record was saved.");
+                let res = await req;
+
+                this.setState({
+                    residentId: res.data.residentID,
+                    creatingNewResident: false
+                }, () => alert("Resident record was created."))
             } catch (ex) {
-                alert('There was an error submitting this record.');
+                alert('There was an error creating the record.');
             }
         } else {
-            console.log("Updating existing")
+            try {
+                let req = axios.put(`/api/resident/${this.state.residentId}`, {
+                    ...fields
+                });
+                await req;
+
+                alert("Resident record was updated.");
+            } catch (ex) {
+                alert("There was an error updating the record.")
+            }
         }
     }
 
     async submitAssignment() {
 
+        try {
+            let req = axios.post('/api/duty/assign', {
+                residentId: this.state.residentId,
+                dutyType: this.state.selectedDutyOption,
+                dateStart: this.state.dutyStartDate,
+                dateEnd: this.state.dutyEndDate
+            });
+            await req;
+
+            alert("Resident was assigned duty");
+        } catch (ex) {
+            alert('There was an error assigning this resident');
+        }
     }
 
     canSubmitResidentChanges() {
@@ -111,9 +185,16 @@ export class ResidentsPage extends Component {
     }
 
     canSubmitAssignment() {
-
         return this.state.dutyEndDate !== "" && this.state.dutyStartDate !== "" &&
-            this.state.selectedDutyOption !== "";
+            this.state.selectedDutyOption != "" && this.state.residentId != "";
+    }
+
+    clearStagedAssignment() {
+        this.setState({
+            selectedDutyOption: "",
+            dutyStartDate: "",
+            dutyEndDate: ""
+        })
     }
 
     renderTestResultOptions = () => this.state.testResultOptions
@@ -130,7 +211,7 @@ export class ResidentsPage extends Component {
     render() {
         return (
             <div>
-                <h1>Resident</h1>
+                <h1>Data Entry</h1>
 
                 <p>Enter resident information:</p>
 
@@ -138,22 +219,18 @@ export class ResidentsPage extends Component {
                     <div className="inline-button-container">
                         <button type="button" className="btn btn-primary btn-sm"
                                 style={{marginRight: "1rem"}}
-                                onClick={(e) => {
-                                    console.log("previous");
-                                    e.target.blur();
-                                }}>Previous
+                                disabled={this.state.previousId == -1}
+                                onClick={(e) => window.location = `?residentId=${this.state.previousId}`}>Previous
                         </button>
                         <button type="button" className="btn btn-primary"
-                                onClick={(e) => {
-                                    console.log("next");
-                                    e.target.blur();
-                                }}>Next
+                                disabled={this.state.nextId == -1}
+                                onClick={(e) => window.location = `?residentId=${this.state.nextId}`}>Next
                         </button>
                     </div>
 
                     <button type="button" className="btn btn-success btn-sm"
                             onClick={(e) => {
-                                console.log("create new");
+                                window.location = "/";
                                 e.target.blur();
                             }}>New
                     </button>
@@ -163,7 +240,8 @@ export class ResidentsPage extends Component {
 
                 <form>
                     <div className="form-group">
-                        <label>ResidentID: {this.state.residentIdDisplayText}</label>
+                        <label>ResidentID: {this.state.creatingNewResident ?
+                            "(New)" : this.state.residentId}</label>
                     </div>
 
                     <div className="form-group-inline-flex">
@@ -230,14 +308,19 @@ export class ResidentsPage extends Component {
                             <label>Date of COVID-19 Testing:</label>
                             <input type="date" className="form-control"
                                    value={this.state.covid19TestDate}
-                                   onChange={e => this.setState({covid19TestDate: e.target.value})}/>
+                                   onChange={e => {
+                                       let v = e.target.value;
+                                       this.setState({covid19TestDate: v});
+                                       if (v === "")
+                                           this.setState({covid19TestResult: "0"})
+                                   }}/>
                         </div>
 
                         <div className="form-group inline-group-item">
                             <label>Result of COVID-19 Test:</label>
                             <select className="form-control"
-                                    disabled={this.state.covid19TestDate === ""}
                                     value={this.state.covid19TestResult}
+                                    disabled={this.state.covid19TestDate === ""}
                                     onChange={e => this.setState({covid19TestResult: e.target.value})}>
                                 {this.renderTestResultOptions()}
                             </select>
@@ -252,7 +335,12 @@ export class ResidentsPage extends Component {
                             <div className="form-check inline-radio-group-item"
                                  onClick={() => this.setState({isQuarantined: false})}>
                                 <input className="form-check-input " type="radio"
-                                       onChange={() => this.setState({isQuarantined: false})}
+                                       onChange={() => {
+                                           this.setState({
+                                               isQuarantined: false,
+                                               quarantinedUntil: ""
+                                           });
+                                       }}
                                        checked={!this.state.isQuarantined}/>
                                 <label className="form-check-label">
                                     Not Quarantined
@@ -275,6 +363,7 @@ export class ResidentsPage extends Component {
                         <div className="form-group inline-group-item">
                             <label>Quarantined Until:</label>
                             <input type="date" className="form-control"
+                                   disabled={!this.state.isQuarantined}
                                    value={this.state.quarantinedUntil}
                                    onChange={e => this.setState({quarantinedUntil: e.target.value})}/>
                         </div>
@@ -321,7 +410,13 @@ export class ResidentsPage extends Component {
                             </div>
                         </div>
 
-                        <button type="button" className="btn btn-primary btn-sm">Assign</button>
+                        <button type="button" className="btn btn-primary btn-sm"
+                                disabled={!this.canSubmitAssignment()}
+                                onClick={async () => {
+                                    await this.submitAssignment();
+                                    this.clearStagedAssignment();
+                                }}>Assign
+                        </button>
                     </div>
                 </form>
             </div>

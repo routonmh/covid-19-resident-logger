@@ -40,3 +40,6 @@ input[type=select], label {
     background-color: rgba(65, 137, 199, 0.09);
 }
 
+.clickable-item {
+    cursor: pointer;
+}

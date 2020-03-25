@@ -48,11 +48,6 @@ export class NavMenu extends Component {
                                 <Glyphicon glyph='ban-circle'/> Quarantined
                             </NavItem>
                         </LinkContainer>
-                        <LinkContainer to={'/tested-positive'}>
-                            <NavItem>
-                                <Glyphicon glyph='warning-sign'/> Tested Postive
-                            </NavItem>
-                        </LinkContainer>
                     </Nav>
                 </Navbar.Collapse>
             </Navbar>

@@ -18,9 +18,10 @@ namespace ResidentLog.Controllers
         /// <param name="residentId"></param>
         /// <returns></returns>
         [HttpGet("{residentId}")]
-        public async Task<Resident> Get(int residentId)
+        public async Task<ResidentDTO> Get(int residentId)
         {
-            return await ResidentModel.GetResidentEntry(residentId);
+            Resident resident = await ResidentModel.GetResidentEntry(residentId);
+            return Resident.ConvertToDTO(resident);
         }
 
         /// <summary>
@@ -29,12 +30,13 @@ namespace ResidentLog.Controllers
         /// <param name="resident"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody, Required] ResidentDTO residentDto)
+        public async Task<ResidentDTO> Post([FromBody, Required] ResidentDTO resident)
         {
             List<TestResult> testResultTypes = await TestResultModel.GetTestResultTypes();
-            Resident resident = Resident.ConvertDTO(residentDto, testResultTypes);
-            await ResidentModel.CreateResidentEntry(resident);
-            return new OkResult();
+            Resident res = Resident.ConvertFromDTO(resident, testResultTypes);
+            int residentId = await ResidentModel.CreateResidentEntry(res);
+            resident.ResidentID = residentId;
+            return resident;
         }
 
         /// <summary>
@@ -43,9 +45,12 @@ namespace ResidentLog.Controllers
         /// <returns></returns>
         [HttpPut("{residentId}")]
         public async Task<ActionResult> Put([FromRoute, Required] int residentId,
-            [FromBody, Required] Resident resident)
+            [FromBody, Required] ResidentDTO resident)
         {
-            await ResidentModel.UpdateResidentEntry(residentId, resident);
+            List<TestResult> testResultTypes = await TestResultModel.GetTestResultTypes();
+            Resident res = Resident.ConvertFromDTO(resident, testResultTypes);
+
+            await ResidentModel.UpdateResidentEntry(residentId, res);
             return new OkResult();
         }
 
@@ -60,6 +65,7 @@ namespace ResidentLog.Controllers
             await ResidentModel.DeleteResidentEntry(residentId);
         }
 
+
         /// <summary>
         ///
         /// </summary>
@@ -70,14 +76,10 @@ namespace ResidentLog.Controllers
             return await TestResultModel.GetTestResultTypes();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("duty-types")]
-        public async Task<List<Duty>> GetDutyTypes()
+        [HttpGet("local-id-set")]
+        public async Task<LocalIDSet<int>> LocalResidentIDs(int residentId)
         {
-            return await DutyModel.GetDutyTypes();
+            return await ResidentModel.PreviousAndNextResidentIds(residentId);
         }
     }
 }

@@ -54,11 +54,21 @@ namespace ResidentLog.Models.Entities
             QuarantinedUntil = quarantinedUntil;
         }
 
-        public static Resident ConvertDTO(ResidentDTO residentDto, List<TestResult> testResultTypes)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="residentDto"></param>
+        /// <param name="testResultTypes"></param>
+        /// <returns></returns>
+        public static Resident ConvertFromDTO(ResidentDTO residentDto, List<TestResult> testResultTypes)
         {
-            int testResultCode = Convert.ToInt32(residentDto.Covid19TestResult);
+            int testResultCode = residentDto.Covid19TestResult;
+            TestResult testResult = new TestResult(
+                testResultCode,
+                testResultTypes.Find(it =>
+                    it.TestResultType == testResultCode).TestResultDescription);
 
-            Resident resident = new Resident(
+            return new Resident(
                 residentDto.ResidentID,
                 residentDto.FirstName,
                 residentDto.LastName,
@@ -67,15 +77,33 @@ namespace ResidentLog.Models.Entities
                 residentDto.SymptomsDate,
                 residentDto.SymptomsDescription,
                 residentDto.Covid19TestDate,
-                new TestResult(
-                    testResultCode,
-                    testResultTypes.Find(it =>
-                        it.TestResultType == testResultCode).TestResultDescription),
+                testResult,
                 residentDto.IsQuarantined,
                 residentDto.QuarantinedUntil
             );
+        }
 
-            return resident;
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="resident"></param>
+        /// <returns></returns>
+        public static ResidentDTO ConvertToDTO(Resident resident)
+        {
+            return new ResidentDTO
+            {
+                ResidentID = resident.ResidentID,
+                FirstName = resident.FirstName,
+                LastName = resident.LastName,
+                PGY = resident.PGY,
+                PhoneNumber = resident.PhoneNumber,
+                SymptomsDate = resident.SymptomsDate,
+                SymptomsDescription = resident.SymptomsDescription,
+                Covid19TestDate = resident.Covid19TestDate,
+                Covid19TestResult = resident.Covid19TestResult.TestResultType,
+                IsQuarantined =  resident.IsQuarantined,
+                QuarantinedUntil = resident.QuarantinedUntil
+            };
         }
     }
 }

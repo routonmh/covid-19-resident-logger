@@ -32,5 +32,30 @@ namespace ResidentLog.Models
 
             return dutyTypes;
         }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="dutyAssignment"></param>
+        /// <returns></returns>
+        public static async Task AssignDuty(DutyAssignment dutyAssignment)
+        {
+            using (LocalDB db = new LocalDB())
+            {
+                await db.OpenConnectionAsync();
+                MySqlCommand cmd = db.CreateCommand();
+                string query = "INSERT INTO duty_assignment (ResidentID, DutyType, DateStart, DateEnd, DateAssigned) " +
+                               "VALUES (@ResidentID, @DutyType, @DateStart, @DateEnd, @DateAssigned)";
+
+                cmd.Parameters.AddWithValue("@ResidentID", dutyAssignment.ResidentID);
+                cmd.Parameters.AddWithValue("@DutyType", dutyAssignment.Duty.DutyType);
+                cmd.Parameters.AddWithValue("@DateStart", dutyAssignment.DateStart);
+                cmd.Parameters.AddWithValue("@DateEnd", dutyAssignment.DateEnd);
+                cmd.Parameters.AddWithValue("@DateAssigned", dutyAssignment.DateAssigned);
+                cmd.CommandText = query;
+
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
     }
 }
