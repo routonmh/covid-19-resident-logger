@@ -125,7 +125,7 @@ namespace ResidentLog.Models.Reports
                                "DutyDescription, DateStart, DateEnd " +
                                "FROM resident " +
                                "LEFT JOIN duty_assignment ON duty_assignment.ResidentID = resident.ResidentID " +
-                               "left JOIN duty ON duty.DutyType = duty_assignment.DutyType " +
+                               "LEFT JOIN duty ON duty.DutyType = duty_assignment.DutyType " +
                                "INNER JOIN test_result ON resident.Covid19TestResult = test_result.TestResultType " +
                                "WHERE DateStart IS NULL " +
                                "OR (@TodayStart < DateStart OR @TodayEnd > DateEnd) " +
@@ -171,7 +171,7 @@ namespace ResidentLog.Models.Reports
                                "LEFT JOIN duty_assignment ON duty_assignment.ResidentID = resident.ResidentID " +
                                "LEFT JOIN duty ON duty.DutyType = duty_assignment.DutyType " +
                                "INNER JOIN test_result ON resident.Covid19TestResult = test_result.TestResultType " +
-                               "(@TodayStart > DateStart AND @TodayEnd < DateEnd) " +
+                               "WHERE (@TodayStart > DateStart AND @TodayEnd < DateEnd) " +
                                $"ORDER BY @FieldName {(asc ? "ASC" : "DESC")} ";
 
                 cmd.Parameters.AddWithValue("@FieldName", sortByFieldName);
