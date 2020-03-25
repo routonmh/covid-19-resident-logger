@@ -1,3 +1,5 @@
+create database residentlog;
+
 create table duty
 (
     DutyType        int         not null
