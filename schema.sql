@@ -1,4 +1,5 @@
 create database residentlog;
+use residentlog;
 
 create table duty
 (
